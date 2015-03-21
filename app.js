@@ -45,10 +45,9 @@ prc.on('close', function (code) {
 });
 app.get('/login', function (req, res) {
 	var str='<html><body><h1>Enter Your Server IP!</h1><input type="TEXT" id="search" size="40"><button type="button" id="submit">Submit</button> </body>\n';
-	var js='<script>$(document).ready(function(){$("#submit").click(function(){var sea=$("#search").val();$.post("http://10.11.11.35:3001/authenticate",{search: sea}, function(data){console.log(data);if(data=="done"){window.location="http://10.11.11.35:3001/allfiles"}else{window.location="http://10.11.11.35:3001/fuck_off"}});});})</script>\n';
+	var js='<script>$(document).ready(function(){$("#submit").click(function(){var sea=$("#search").val();$.post("http://10.11.11.35:3001/authenticate",{search: sea}, function(data){console.log(data);if(data=="done"){window.location="http://10.11.11.35:3001/search"}else{window.location="http://10.11.11.35:3001/fuck_off"}});});})</script>\n';
 	var incl='<script src="http://10.11.11.35:3001/readjquery"></script></html>\n';
 	res.send(str+incl+js);
-	res.send('ok');
 
 });
 
@@ -103,10 +102,50 @@ app.post('/authenticate',function(req,response){
 app.get('/fuck_off', function (req, res) {
  	res.send('Start Your Server First');
 });
+
+app.get('/search', function (req, res) {
+  var str='<html><body><h1>Search!</h1><input type="TEXT" id="search" size="40"><button type="button" id="submit">Submit</button> <button onclick="parent.location=\'http://10.11.11.35:3001/allfiles\'">All-files</button></body><table id="table"></table>\n';
+  var js='<script>$(document).ready(function(){$("#submit").click(function(){var sea=$("#search").val();$.post("http://10.11.11.35:3001/search",{search: sea}, function(data){$("#table").html(data)});});})</script>\n';
+  var incl='<script src="http://10.11.11.35:3001/readjquery"></script></html>\n';
+  res.send(str+incl+js);
+});
+
+app.post('/search', function (req, res) {
+  console.log(req.body.search);
+    var data=fs.readFileSync('allfiles','utf8');
+    data=data.split('\n');
+    var prev='',prev_in=0,ip_index=-1,html='';
+    for(var i=0;i<data.length-1;i++)
+    {
+      console.log(temp);
+      var temp=data[i];
+      temp=temp.split(' ');
+      var request=req.body.search.toLowerCase();
+      if(temp[0]!=prev)
+      {
+        ip_index+=1;
+        prev=temp[0];
+        prev_in=0;
+      }
+      else
+      {
+        prev_in+=1;
+      }
+      var tem=temp[1].toLowerCase();
+      if(tem.indexOf(request) > -1) {
+        var ids=ip_index*10000+prev_in;
+        html+='<tr><td><button onclick="parent.location=\'http://'+temp[0]+':3000/downloads/'+prev_in+'\'" method="link" size=40>'+temp[1]+'</button></td></tr>'; 
+      } 
+    }
+    res.send(html);
+});
+
 app.get('/allfiles', function (req, res) {
 	var data=fs.readFileSync('allfiles.html','utf8');
  	res.send(data);
 });
+
+
 app.get('/readjquery',function(req,res){
 	fs.readFile('jquery.min.js', 'utf8', function (err,data) {
   		if (err) {

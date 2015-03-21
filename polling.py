@@ -12,6 +12,7 @@ while True:
 	js='<script src="http://10.11.11.35:3000/readjquery">  </script>';
 	f1=open('listofips','r');
 	ip_index=0
+	allfiles=''
 	for line in f1:
 		try:
 			
@@ -27,6 +28,7 @@ while True:
 				html+='<tr><td><button type="TEXT" id="'+(str)(ids)+'" size="40">'+files+'<br></td></td>';
 				html+='</tr>'
 				js+='<script>$(document).ready(function(){$("#'+(str)(ids)+'").click(function(){window.location="http://'+line[:-1]+':3000/downloads/'+(str)(ids%10000)+'";});})</script>';
+				allfiles+=line[:-1]+' '+files+'\n'
 				ids+=1
 			ip_index+=1
 		except:
@@ -34,6 +36,10 @@ while True:
 	html+='</table></html>'
 	f2=open('allfiles.html','w')
 	f2.write(html+js)
+	f2.close()
+	f1.close()
+	f2=open('allfiles','w')
+	f2.write(allfiles)
 	f2.close()
 	f1.close()
 	time.sleep(5);
