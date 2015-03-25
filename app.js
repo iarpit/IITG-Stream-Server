@@ -45,7 +45,7 @@ prc.on('close', function (code) {
 });
 app.get('/login', function (req, res) {
 	var str='<html><body><h1>Enter Your Server IP!</h1><input type="TEXT" id="search" size="40"><button type="button" id="submit">Submit</button> </body>\n';
-	var js='<script>$(document).ready(function(){$("#submit").click(function(){var sea=$("#search").val();$.post("http://10.11.11.35:3001/authenticate",{search: sea}, function(data){console.log(data);if(data=="done"){window.location="http://10.11.11.35:3001/search"}else{window.location="http://10.11.11.35:3001/fuck_off"}});});})</script>\n';
+	var js='<script>$(document).ready(function(){$("#submit").click(function(){var sea=$("#search").val();$.post("http://10.11.11.35:3001/authenticate",{search: sea}, function(data){console.log(data);if(data=="done"){window.location="http://10.11.11.35:3001/search"}else{window.location="http://10.11.11.35:3001/error?ip="+data+"&yip="+sea}});});})</script>\n';
 	var incl='<script src="http://10.11.11.35:3001/readjquery"></script></html>\n';
 	res.send(str+incl+js);
 
@@ -62,7 +62,7 @@ app.post('/authenticate',function(req,response){
 }); 
 	if(ip!=req.body.search)
 	{
-		response.send('fuck');
+		response.send(ip);
 	}
   else{
   	var options = {
@@ -90,7 +90,7 @@ app.post('/authenticate',function(req,response){
    		 	}
    		 	else
    		 	{
-   		 		response.send('fuck')
+   		 		response.send(ip)
    		 	}
     		});
   	}).on('error', function(e) {
@@ -99,8 +99,14 @@ app.post('/authenticate',function(req,response){
   }
 });
 
-app.get('/fuck_off', function (req, res) {
- 	res.send('Start Your Server First');
+app.get('/error', function (req, res) {
+ 	html='<html><p>Start Your Server First</p>';
+  html+='<p>Your IP is '+req.query.ip+'</p>';
+  html+='<p>If it is 202.* then perhaps you are not bypassing proxy</p>';
+  html+='<p>You entered '+req.query.yip+'</p>';
+  html+='<p>Or maybe you have entered Wrong IP Address</p></html>';
+  res.send(html);
+
 });
 
 app.get('/search', function (req, res) {
